@@ -39,10 +39,21 @@ ifeq ($(TARGET_BUILD_VARIANT),eng)
 # Disable ADB authentication
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure=0
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.usb.config=adb
+ifeq ($(TARGET_PRODUCT),aosp_crux)
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure.recovery=0
+endif
+else
+ifeq ($(TARGET_PRODUCT):$(TARGET_BUILD_VARIANT),aosp_crux:userdebug)
+# Development Crux images must expose ADB before the first Settings session.
+# Recovery uses its own authentication property; user builds retain the defaults.
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure=0
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure.recovery=0
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.usb.config=adb
 else
 # Enable ADB authentication
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure=1
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.usb.config=none
+endif
 
 # Disable extra StrictMode features on all non-engineering builds
 PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.strictmode.disable=true
